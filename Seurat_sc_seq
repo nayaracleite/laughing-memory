@@ -1,0 +1,36 @@
+install.packages('devtools')
+
+devtools::install_github(repo = 'satijalab/seurat', ref = 'develop')
+
+devtools::install_github(repo = 'satijalab/seurat', ref = 'release/3.0')
+library(Seurat)
+library(dplyr)
+
+packageVersion(pkg = "Seurat")
+
+# Load the immune conditions (immune.condition_raw_clusters.pseudobulk) dataset
+immune.condition.data <- read.csv("/users/nayaracleite/nayara/immune.condition_raw_clusters.pseudobulk.csv", sep = ",")
+
+#File import and preparation
+immune.condition.data <- immune.condition.data[order(immune.condition.data$cocult__0),]
+row.names(immune.condition.data)<-immune.condition.data$X
+immune.condition.data <- immune.condition.data[1:15467,-1]
+immune.condition.data <- data.matrix(immune.condition.data)
+row.names = (1)
+header = T
+
+# Examine the memory savings between regular and sparse matrices
+dense.size <- object.size(x = as.matrix(x = immune.condition.data))
+dense.size
+
+sparse.size <- object.size(x = immune.condition.data)
+sparse.size
+
+dense.size/sparse.size
+
+# Initialize the Seurat object with the raw (non-normalized data).  Keep all
+# genes expressed in >= 3 cells (~0.1% of the data). Keep all cells with at
+# least 200 detected genes
+
+immune.condition <- CreateSeuratObject(immune.condition_raw_clusters.pseudobulk = immune.condition.data, min.cells = 3, min.genes = 200, 
+                           project = "indrops_PBMC")
